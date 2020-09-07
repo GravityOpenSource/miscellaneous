@@ -1,0 +1,38 @@
+# config for alignment2redis
+
+# currently only supports one reference genome 
+reference:
+  # reference genome name, do not use space and should be consistent in FASTA file header
+  genome_name : klebsiella_pneumonia
+  # reference genome FASTA file path (only regard the first FASTA record as the target genome record, other following records will be ignored)
+  fasta_file : test/kp_genome.fa.gz
+
+# redis server and port
+# authentication is not used since it assumes redis is installed in the same server
+redis:
+  server : 127.0.0.1
+  port : 7777
+
+# binning for viz
+# coverage and depth will be calcualted based on the bin num and bin length
+# e.g. klebsiella pneumonia genome size is 5333942, while covid-19 genome size is about 29000
+# if bin_num is 1000, the bin lengh will be 5.3K bp and 29 bp, respectively.
+# while the smallest virus is Hepatitis delta virus(RNA virus), whose genome size is about 1700,
+# so the bin num of 1000 should be fine.
+# each read mapping from start to end will fall into corresponding projected bins and increase by 1  
+# do NOT change these during the run, otherwise you will get inconsistent bin num which will cause error
+# in the downstream viz 
+viz:
+  bin_num : 1000
+
+# minimap2 options, DO NOT change unless you exactly know it
+minimap2:
+  # device and mode
+  preset : map-ont
+  # only needs the primary hit
+  # I think there is a bug of mappy, best_n will report 2 hits including the primary one
+  # but it should be not set to 0 even it will return exactly one for sake of bug fix later
+  # current solution is to filter the hit is primary or not if there are two hits
+  best_n : 1
+  # minimium mapq which read will be kept
+  min_mapq: 40
